@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Website Organizer</title>
+
+<style>
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 42px 7%;
+  background-color: #101820;
+  background-image:
+    linear-gradient(rgba(16, 24, 32, .38), rgba(16, 24, 32, .38)),
+    url("Website Organizer.jpg");
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: #f4f7f8;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* The title is centered and raised; the subtitle stays in its usual spot. */
+.topbar {
+  position: relative;
+  min-height: 70px;
+  margin-bottom: 20px;
+}
+
+.brand-area { padding-top: 51px; }
+
+h1 {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+  color: #f4f7f8;
+  font-size: 44px;
+  line-height: 1.05;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.subtitle {
+  margin: 0;
+  color: #f0eafa;
+}
+
+.search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 26px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  gap: 10px;
+  padding: 0 15px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 12px;
+  background: rgba(25, 40, 50, .82);
+}
+
+.search-field:focus-within {
+  outline: 2px solid #e8b5ff;
+  outline-offset: 2px;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  color: #c9c3d1;
+}
+
+.search-box {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f4f7f8;
+  font: inherit;
+}
+
+.search-box::placeholder { color: #c9c3d1; }
+
+.action-area {
+  position: relative;
+  z-index: 5;
+}
+
+.plus-button {
+  width: 52px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 12px;
+  background: rgba(25, 40, 50, .82);
+  color: #f4f7f8;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.plus-button:hover { background: rgba(49, 81, 92, .95); }
+
+.action-menu {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  width: 190px;
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 13px;
+  background: rgba(25, 31, 47, .97);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+}
+
+.action-menu button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #f4f7f8;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.action-menu button:hover {
+  background: rgba(232, 181, 255, .18);
+  color: #f4d8ff;
+}
+
+/* Three independent stacks: opening a category only moves cards below it
+   in the same column. */
+.categories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.category-column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  gap: 20px;
+}
+
+.card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, .20);
+  border-radius: 18px;
+  background: rgba(25, 40, 50, .18);
+}
+
+/* A closed category is about as tall as one website-link row. */
+.card.is-collapsed { padding: 8px 14px; }
+
+.category-heading {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  margin: 0 0 14px;
+}
+
+.card.is-collapsed .category-heading { margin-bottom: 0; }
+
+.category-title {
+  width: 100%;
+  height: 44px;
+  padding: 0 42px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #aaf3df;
+  font: 700 24px/1.2 "Segoe UI", Arial, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-title:hover:not(:disabled) { color: #e8b5ff; }
+
+.category-title:focus-visible,
+.pencil-button:focus-visible {
+  outline: 2px solid #e8b5ff;
+  outline-offset: 3px;
+}
+
+.category-title:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.category-grip {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 32px;
+  border-radius: 8px;
+  color: #f0d6ff;
+  cursor: grab;
+  user-select: none;
+  transform: translateY(-50%);
+}
+
+.category-grip:hover { background: rgba(232, 181, 255, .17); }
+
+.pencil-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 227, 169, .4);
+  border-radius: 9px;
+  background: rgba(58, 43, 29, .82);
+  color: #ffe3a9;
+  font-size: 18px;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.pencil-button:hover { background: rgba(86, 62, 38, .95); }
+
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.website-link {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 10px;
+  margin: 9px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(36, 57, 68, .88);
+  color: #f4f7f8;
+  text-decoration: none;
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.website-link:hover,
+.website-link:focus-visible {
+  background: rgba(49, 81, 92, .95);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(8, 16, 21, .25);
+}
+
+.website-link:focus-visible {
+  outline: 2px solid #e8b5ff;
+  outline-offset: 2px;
+}
+
+.website-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 50%;
+  background: #e8b5ff;
+}
+
+.logo-slot {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  margin-left: auto;
+}
+
+.site-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  background: #e8b5ff;
+  color: #29113b;
+  font: 700 10px "Segoe UI", Arial, sans-serif;
+}
+
+.link-grip {
+  display: none;
+  width: 28px;
+  flex: 0 0 28px;
+  color: #f0d6ff;
+  text-align: center;
+  cursor: grab;
+  user-select: none;
+}
+
+.edit-mode .link-grip { display: inline-block; }
+
+.remove-link {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border: 1px solid rgba(255, 150, 166, .45);
+  border-radius: 10px;
+  background: rgba(86, 35, 49, .88);
+  color: #ffd0d7;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove-link:hover { background: #9c3f55; }
+
+.empty-category {
+  margin: 12px 4px;
+  color: #d9d0e0;
+  font-size: 14px;
+}
+
+.category-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, .14);
+}
+
+.editor-button {
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: 600 14px "Segoe UI", Arial, sans-serif;
+  cursor: pointer;
+}
+
+.add-link-button {
+  border-color: rgba(138, 235, 202, .35);
+  background: rgba(34, 87, 75, .92);
+  color: #c9ffe9;
+}
+
+.add-link-button:hover { background: rgba(39, 115, 91, .98); }
+
+.remove-category-button {
+  border-color: rgba(255, 150, 166, .35);
+  background: rgba(92, 38, 51, .9);
+  color: #ffd0d7;
+}
+
+.remove-category-button:hover { background: rgba(145, 52, 71, .98); }
+
+.link-form {
+  display: grid;
+  gap: 9px;
+  margin: 12px 0 4px;
+  padding: 13px;
+  border: 1px solid rgba(138, 235, 202, .3);
+  border-radius: 12px;
+  background: rgba(16, 35, 40, .78);
+}
+
+.link-form input,
+.draft-name {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .93);
+  color: #1c2230;
+  font: inherit;
+}
+
+.link-form input:focus,
+.draft-name:focus {
+  outline: 2px solid #aaf3df;
+  outline-offset: 1px;
+}
+
+.form-actions { display: flex; gap: 8px; }
+
+.save-link-button {
+  background: #b9f1d6;
+  color: #17372c;
+}
+
+.cancel-link-button {
+  border-color: rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .13);
+  color: #f4f7f8;
+}
+
+.form-error {
+  margin: 0;
+  color: #ffd0d7;
+  font-size: 13px;
+}
+
+.draft-card {
+  border-color: rgba(232, 181, 255, .55);
+  background: rgba(55, 34, 68, .38);
+}
+
+.draft-name {
+  height: 44px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.draft-hint {
+  margin: 12px 0 0;
+  color: #f0eafa;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cancel-draft-button {
+  display: block;
+  margin: 13px auto 0;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .12);
+  color: #f4f7f8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dragging { opacity: .42; }
+
+.drop-target {
+  outline: 2px dashed #e8b5ff;
+  outline-offset: 3px;
+}
+
+.undo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: calc(100vw - 32px);
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 12px;
+  background: rgba(25, 31, 47, .97);
+  color: #f4f7f8;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .3);
+  transform: translateX(-50%);
+}
+
+.undo-button {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #b9f1d6;
+  color: #17372c;
+  font: 700 14px "Segoe UI", Arial, sans-serif;
+  cursor: pointer;
+}
+
+#noResults {
+  margin-top: 24px;
+  color: #f0eafa;
+}
+
+.recent-section { margin: 0 0 24px; }
+
+.recent-heading {
+  margin: 0 0 10px;
+  color: #f0eafa;
+  font-size: 16px;
+}
+
+.recent-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.recent-link { margin: 0; }
+
+@media (max-width: 900px) {
+  .categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  body { padding: 28px 5%; }
+  h1 { font-size: 32px; }
+  .categories { grid-template-columns: 1fr; }
+  .recent-links { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="brand-area">
+    <h1>Websites World</h1>
+    <p class="subtitle">Everything I use, in one place.</p>
+  </div>
+</header>
+
+<div class="search-row">
+  <label class="search-field" for="siteSearch">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="10.8" cy="10.8" r="6.8"></circle>
+      <path d="m16 16 5 5"></path>
+    </svg>
+    <input id="siteSearch" class="search-box" type="search"
+      placeholder="Search websites..." aria-label="Search websites">
+  </label>
+
+  <div class="action-area" id="actionArea">
+    <button class="plus-button" id="plusButton" type="button"
+      aria-label="Open organizer menu" aria-expanded="false">+</button>
+
+    <div class="action-menu" id="actionMenu" hidden>
+      <button id="newCategoryButton" type="button">＋ New category</button>
+      <button id="editModeButton" type="button">✏ Edit category</button>
+    </div>
+  </div>
+</div>
+
+<section class="recent-section" id="recentSection" hidden>
+  <h2 class="recent-heading">Recently opened</h2>
+  <div class="recent-links" id="recentLinks"></div>
+</section>
+
+<div class="categories" id="categories"></div>
+<p id="noResults" hidden>No websites match your search.</p>
+
+<div class="undo-toast" id="undoToast" hidden>
+  <span id="undoMessage"></span>
+  <button class="undo-button" id="undoButton" type="button">Undo</button>
+</div>
+
+<script>
+const STORAGE_KEY = "websiteOrganizerCategoriesV2";
+const RECENT_KEY = "websiteOrganizerRecentLinksV1";
+
+const defaultCategories = [
+  {
+    id: "study",
+    name: "Study",
+    links: [
+      { id: "google", name: "Google", url: "https://www.google.com" },
+      { id: "youtube", name: "YouTube", url: "https://www.youtube.com" }
+    ]
+  },
+  {
+    id: "work",
+    name: "Work",
+    links: [
+      { id: "notion", name: "Notion", url: "https://www.notion.so" },
+      { id: "drive", name: "Google Drive", url: "https://drive.google.com" }
+    ]
+  },
+  {
+    id: "other",
+    name: "Other",
+    links: [
+      { id: "wikipedia", name: "Wikipedia", url: "https://www.wikipedia.org" }
+    ]
+  }
+];
+
+function loadCategories() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (error) {
+    console.warn("Could not load saved organizer data.", error);
+  }
+  return JSON.parse(JSON.stringify(defaultCategories));
+}
+
+function loadRecentLinks() {
+  try {
+    const saved = localStorage.getItem(RECENT_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed.slice(0, 3);
+    }
+  } catch (error) {
+    console.warn("Could not load recently opened links.", error);
+  }
+  return [];
+}
+
+let categories = loadCategories();
+let recentLinks = loadRecentLinks();
+let openCategoryIds = new Set();
+let searchAutoOpenIds = new Set();
+let editMode = false;
+let editingCategoryId = null;
+let savedOpenCategoryIds = null;
+let draftCategoryActive = false;
+let linkFormCategoryId = null;
+let formError = "";
+let undoAction = null;
+let undoTimer = null;
+let lastColumnCount = 0;
+
+const categoriesElement = document.getElementById("categories");
+const searchBox = document.getElementById("siteSearch");
+const plusButton = document.getElementById("plusButton");
+const actionMenu = document.getElementById("actionMenu");
+const editModeButton = document.getElementById("editModeButton");
+const noResults = document.getElementById("noResults");
+const recentSection = document.getElementById("recentSection");
+const recentLinksElement = document.getElementById("recentLinks");
+const undoToast = document.getElementById("undoToast");
+const undoMessage = document.getElementById("undoMessage");
+
+function makeId(prefix) {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return prefix + "-" + window.crypto.randomUUID();
+  }
+  return prefix + "-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+}
+
+function saveCategories() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
+  } catch (error) {
+    alert("The browser could not save your changes. Check that it can save site data.");
+  }
+}
+
+function saveRecentLinks() {
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recentLinks));
+  } catch (error) {
+    console.warn("Could not save recently opened links.", error);
+  }
+}
+
+function makeElement(tag, className, text) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+}
+
+function getFaviconSources(url) {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    const bareHost = host.replace(/^www\./i, "");
+    const hosts = [...new Set([host, bareHost])];
+
+    return [
+      new URL("/favicon.ico", parsed.origin).href,
+      new URL("/favicon.png", parsed.origin).href,
+      new URL("/favicon-32x32.png", parsed.origin).href,
+      new URL("/apple-touch-icon.png", parsed.origin).href,
+      ...hosts.map(name =>
+        "https://icons.duckduckgo.com/ip3/" + encodeURIComponent(name) + ".ico"
+      )
+    ];
+  } catch (error) {
+    return [];
+  }
+}
+
+function makeLogo(url, websiteName) {
+  const slot = makeElement("span", "logo-slot");
+  const image = makeElement("img", "site-logo");
+  image.alt = "";
+  image.loading = "lazy";
+  image.draggable = false;
+
+  const fallback = makeElement("span", "logo-fallback");
+  const initials = websiteName.trim().split(/\s+/)
+    .slice(0, 2)
+    .map(part => part[0] || "")
+    .join("")
+    .toUpperCase();
+
+  fallback.textContent = initials || "?";
+  fallback.hidden = true;
+  slot.append(image, fallback);
+
+  const sources = getFaviconSources(url);
+  let sourceIndex = 0;
+
+  function tryNextSource() {
+    if (sourceIndex >= sources.length) {
+      image.hidden = true;
+      fallback.hidden = false;
+      return;
+    }
+
+    image.hidden = false;
+    image.onerror = tryNextSource;
+    image.onload = () => { fallback.hidden = true; };
+    image.src = sources[sourceIndex++];
+  }
+
+  tryNextSource();
+  return slot;
+}
+
+function recordRecent(category, link) {
+  recentLinks = recentLinks.filter(item => item.url !== link.url);
+  recentLinks.unshift({
+    id: link.id,
+    name: link.name,
+    url: link.url,
+    categoryName: category.name,
+    openedAt: Date.now()
+  });
+  recentLinks = recentLinks.slice(0, 3);
+  saveRecentLinks();
+  renderRecent(searchBox.value.trim().toLowerCase());
+}
+
+function renderRecent(query) {
+  recentLinksElement.replaceChildren();
+
+  const matches = recentLinks.filter(item =>
+    !query || item.name.toLowerCase().includes(query)
+  );
+
+  recentSection.hidden = matches.length === 0;
+
+  matches.forEach(item => {
+    const anchor = makeElement("a", "website-link recent-link");
+    anchor.href = item.url;
+    anchor.target = "_blank";
+    anchor.rel = "noopener noreferrer";
+    anchor.title = item.name + " · " + item.categoryName;
+    anchor.draggable = false;
+
+    const dot = makeElement("span", "dot");
+    dot.setAttribute("aria-hidden", "true");
+
+    const name = makeElement("span", "website-name", item.name);
+    const logo = makeLogo(item.url, item.name);
+    anchor.append(dot, name, logo);
+
+    anchor.addEventListener("click", () => {
+      recordRecent({ name: item.categoryName }, item);
+    });
+
+    recentLinksElement.append(anchor);
+  });
+
+  return matches.length > 0;
+}
+
+function showUndo(message, action) {
+  clearTimeout(undoTimer);
+  undoAction = action;
+  undoMessage.textContent = message;
+  undoToast.hidden = false;
+
+  undoTimer = setTimeout(() => {
+    undoAction = null;
+    undoToast.hidden = true;
+  }, 8000);
+}
+
+function performUndo() {
+  if (!undoAction) return;
+
+  const action = undoAction;
+  clearTimeout(undoTimer);
+  undoAction = null;
+  undoToast.hidden = true;
+
+  if (action.type === "link") {
+    const category = categories.find(item => item.id === action.categoryId);
+    if (!category) {
+      alert("That category no longer exists, so the website link could not be restored.");
+      return;
+    }
+    category.links.splice(Math.min(action.index, category.links.length), 0, action.link);
+  } else if (action.type === "category") {
+    categories.splice(Math.min(action.index, categories.length), 0, action.category);
+    if (action.wasOpen || editMode) openCategoryIds.add(action.category.id);
+    if (savedOpenCategoryIds && action.wasSavedOpen) {
+      savedOpenCategoryIds.add(action.category.id);
+    }
+  }
+
+  saveCategories();
+  render();
+}
+
+function normaliseWebsiteUrl(value) {
+  let candidate = value.trim();
+
+  if (!/^https?:\/\//i.test(candidate)) {
+    candidate = "https://" + candidate;
+  }
+
+  const parsed = new URL(candidate);
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Use a website address beginning with http:// or https://");
+  }
+
+  return parsed.href;
+}
+
+function enterEditMode() {
+  if (!editMode) savedOpenCategoryIds = new Set(openCategoryIds);
+
+  editMode = true;
+  editingCategoryId = null;
+  linkFormCategoryId = null;
+  formError = "";
+  searchBox.value = "";
+  searchAutoOpenIds.clear();
+
+  categories.forEach(category => openCategoryIds.add(category.id));
+  document.body.classList.add("edit-mode");
+  render();
+}
+
+function exitEditMode() {
+  editMode = false;
+  editingCategoryId = null;
+  linkFormCategoryId = null;
+  formError = "";
+  openCategoryIds = savedOpenCategoryIds
+    ? new Set(savedOpenCategoryIds)
+    : new Set();
+  savedOpenCategoryIds = null;
+
+  document.body.classList.remove("edit-mode");
+  render();
+}
+
+function startNewCategory() {
+  actionMenu.hidden = true;
+  plusButton.setAttribute("aria-expanded", "false");
+
+  if (!editMode) enterEditMode();
+
+  draftCategoryActive = true;
+  searchBox.value = "";
+  searchAutoOpenIds.clear();
+  render();
+
+  requestAnimationFrame(() => {
+    const input = document.querySelector(".draft-name");
+    if (input) input.focus();
+  });
+}
+
+function removeLink(category, link) {
+  const index = category.links.findIndex(item => item.id === link.id);
+  if (index < 0) return;
+
+  category.links.splice(index, 1);
+  saveCategories();
+  showUndo("Removed “" + link.name + "”.", {
+    type: "link",
+    categoryId: category.id,
+    link,
+    index
+  });
+  render();
+}
+
+function removeCategory(category) {
+  const index = categories.findIndex(item => item.id === category.id);
+  if (index < 0) return;
+
+  const wasOpen = openCategoryIds.has(category.id);
+  const wasSavedOpen = savedOpenCategoryIds
+    ? savedOpenCategoryIds.has(category.id)
+    : false;
+
+  categories.splice(index, 1);
+  openCategoryIds.delete(category.id);
+  searchAutoOpenIds.delete(category.id);
+  if (savedOpenCategoryIds) savedOpenCategoryIds.delete(category.id);
+
+  editingCategoryId = null;
+  linkFormCategoryId = null;
+  saveCategories();
+
+  showUndo("Removed category “" + category.name + "”.", {
+    type: "category",
+    category,
+    index,
+    wasOpen,
+    wasSavedOpen
+  });
+  render();
+}
+
+function reorderCategory(sourceId, targetId) {
+  if (sourceId === targetId) return;
+
+  const sourceIndex = categories.findIndex(item => item.id === sourceId);
+  const targetIndex = categories.findIndex(item => item.id === targetId);
+  if (sourceIndex < 0 || targetIndex < 0) return;
+
+  const [source] = categories.splice(sourceIndex, 1);
+  const newTargetIndex = categories.findIndex(item => item.id === targetId);
+  categories.splice(newTargetIndex, 0, source);
+
+  saveCategories();
+  render();
+}
+
+function moveLink(sourceCategoryId, linkId, targetCategoryId, targetLinkId) {
+  const sourceCategory = categories.find(item => item.id === sourceCategoryId);
+  const targetCategory = categories.find(item => item.id === targetCategoryId);
+  if (!sourceCategory || !targetCategory) return;
+  if (sourceCategoryId === targetCategoryId && linkId === targetLinkId) return;
+
+  const sourceIndex = sourceCategory.links.findIndex(item => item.id === linkId);
+  if (sourceIndex < 0) return;
+
+  const [link] = sourceCategory.links.splice(sourceIndex, 1);
+  let targetIndex = targetLinkId
+    ? targetCategory.links.findIndex(item => item.id === targetLinkId)
+    : -1;
+
+  if (targetIndex < 0) targetIndex = targetCategory.links.length;
+  targetCategory.links.splice(targetIndex, 0, link);
+
+  saveCategories();
+  render();
+}
+
+function addDragHandle(className, label, data) {
+  const handle = makeElement("span", className, "⠿");
+  handle.draggable = true;
+  handle.title = label;
+  handle.setAttribute("aria-label", label);
+  handle.dataset.dragType = data.type;
+
+  if (data.categoryId) handle.dataset.categoryId = data.categoryId;
+  if (data.linkId) handle.dataset.linkId = data.linkId;
+
+  return handle;
+}
+
+function buildWebsiteLink(category, link, showRemove) {
+  const row = makeElement("div", "link-row");
+  row.dataset.categoryId = category.id;
+  row.dataset.linkId = link.id;
+
+  if (editMode) {
+    row.append(addDragHandle(
+      "link-grip drag-handle",
+      "Drag to reorder or move this website",
+      { type: "link", categoryId: category.id, linkId: link.id }
+    ));
+  }
+
+  const anchor = makeElement("a", "website-link");
+  anchor.href = link.url;
+  anchor.target = "_blank";
+  anchor.rel = "noopener noreferrer";
+  anchor.title = link.name;
+  anchor.draggable = false;
+  anchor.addEventListener("click", () => recordRecent(category, link));
+
+  const dot = makeElement("span", "dot");
+  dot.setAttribute("aria-hidden", "true");
+
+  const name = makeElement("span", "website-name", link.name);
+  const logo = makeLogo(link.url, link.name);
+  anchor.append(dot, name, logo);
+  row.append(anchor);
+
+  if (showRemove) {
+    const removeButton = makeElement("button", "remove-link", "−");
+    removeButton.type = "button";
+    removeButton.title = "Remove " + link.name;
+    removeButton.setAttribute("aria-label", "Remove " + link.name);
+    removeButton.addEventListener("click", () => removeLink(category, link));
+    row.append(removeButton);
+  }
+
+  return row;
+}
+
+function buildLinkForm(category) {
+  const form = makeElement("form", "link-form");
+
+  const nameInput = makeElement("input");
+  nameInput.name = "websiteName";
+  nameInput.placeholder = "Website name";
+  nameInput.required = true;
+  nameInput.maxLength = 80;
+
+  const urlInput = makeElement("input");
+  urlInput.name = "websiteUrl";
+  urlInput.placeholder = "Website address (for example: example.com)";
+  urlInput.required = true;
+  urlInput.type = "text";
+  urlInput.inputMode = "url";
+
+  const actions = makeElement("div", "form-actions");
+
+  const saveButton = makeElement("button", "editor-button save-link-button", "Save link");
+  saveButton.type = "submit";
+
+  const cancelButton = makeElement("button", "editor-button cancel-link-button", "Cancel");
+  cancelButton.type = "button";
+  cancelButton.addEventListener("click", () => {
+    linkFormCategoryId = null;
+    formError = "";
+    render();
+  });
+
+  actions.append(saveButton, cancelButton);
+  form.append(nameInput, urlInput, actions);
+
+  if (formError) form.append(makeElement("p", "form-error", formError));
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    try {
+      const url = normaliseWebsiteUrl(urlInput.value);
+      category.links.push({ id: makeId("link"), name, url });
+      saveCategories();
+      linkFormCategoryId = null;
+      formError = "";
+      render();
+    } catch (error) {
+      formError = "Enter a valid website address, such as example.com";
+      render();
+
+      requestAnimationFrame(() => {
+        const refreshedUrl = document.querySelector(
+          '.link-form input[name="websiteUrl"]'
+        );
+        if (refreshedUrl) refreshedUrl.focus();
+      });
+    }
+  });
+
+  return form;
+}
+
+function buildCategoryCard(category, query) {
+  const matchingLinks = category.links.filter(link =>
+    !query || link.name.toLowerCase().includes(query)
+  );
+
+  const card = makeElement("section", "card");
+  card.dataset.categoryId = category.id;
+  card.hidden = Boolean(query && matchingLinks.length === 0);
+
+  const heading = makeElement("h2", "category-heading");
+
+  if (editMode) {
+    heading.append(addDragHandle(
+      "category-grip drag-handle",
+      "Drag to reorder this category",
+      { type: "category", categoryId: category.id }
+    ));
+  }
+
+  const titleButton = makeElement("button", "category-title", category.name);
+  titleButton.type = "button";
+
+  const isOpen =
+    editMode ||
+    openCategoryIds.has(category.id) ||
+    searchAutoOpenIds.has(category.id);
+
+  titleButton.setAttribute("aria-expanded", String(isOpen));
+  titleButton.setAttribute(
+    "aria-label",
+    category.name + (editMode ? " category" : " category, open or close")
+  );
+  titleButton.disabled = editMode;
+
+  titleButton.addEventListener("click", event => {
+    if (editMode) return;
+
+    const currentlyOpen =
+      openCategoryIds.has(category.id) ||
+      searchAutoOpenIds.has(category.id);
+
+    if (event.ctrlKey) {
+      if (currentlyOpen) {
+        openCategoryIds.delete(category.id);
+        searchAutoOpenIds.delete(category.id);
+      } else {
+        openCategoryIds.add(category.id);
+        searchAutoOpenIds.delete(category.id);
+      }
+    } else {
+      openCategoryIds.clear();
+      searchAutoOpenIds.clear();
+      if (!currentlyOpen) openCategoryIds.add(category.id);
+    }
+
+    render();
+  });
+
+  heading.append(titleButton);
+
+  if (editMode) {
+    const pencil = makeElement("button", "pencil-button", "✏");
+    pencil.type = "button";
+    pencil.title = "Edit links in " + category.name;
+    pencil.setAttribute("aria-label", "Edit links in " + category.name);
+
+    pencil.addEventListener("click", () => {
+      editingCategoryId =
+        editingCategoryId === category.id ? null : category.id;
+      linkFormCategoryId = null;
+      formError = "";
+      render();
+    });
+
+    heading.append(pencil);
+  }
+
+  card.append(heading);
+
+  const linksPanel = makeElement("div", "category-links");
+  linksPanel.hidden = !isOpen;
+  card.classList.toggle("is-collapsed", !isOpen);
+
+  if (matchingLinks.length === 0 && !query) {
+    linksPanel.append(
+      makeElement("p", "empty-category", "No websites yet. Use the pencil to add one.")
+    );
+  }
+
+  const showRemove = editMode && editingCategoryId === category.id;
+  matchingLinks.forEach(link => {
+    linksPanel.append(buildWebsiteLink(category, link, showRemove));
+  });
+
+  if (showRemove) {
+    if (linkFormCategoryId === category.id) {
+      linksPanel.append(buildLinkForm(category));
+    }
+
+    const editorActions = makeElement("div", "category-editor-actions");
+
+    const addLinkButton = makeElement(
+      "button",
+      "editor-button add-link-button",
+      "＋ Add link"
+    );
+    addLinkButton.type = "button";
+    addLinkButton.addEventListener("click", () => {
+      linkFormCategoryId = category.id;
+      formError = "";
+      render();
+
+      requestAnimationFrame(() => {
+        const input = document.querySelector(
+          '.link-form input[name="websiteName"]'
+        );
+        if (input) input.focus();
+      });
+    });
+
+    const removeCategoryButton = makeElement(
+      "button",
+      "editor-button remove-category-button",
+      "− Remove category"
+    );
+    removeCategoryButton.type = "button";
+    removeCategoryButton.addEventListener("click", () => removeCategory(category));
+
+    editorActions.append(addLinkButton, removeCategoryButton);
+    linksPanel.append(editorActions);
+  }
+
+  card.append(linksPanel);
+  return card;
+}
+
+function buildDraftCard() {
+  const card = makeElement("section", "card draft-card");
+  const form = makeElement("form", "draft-form");
+  const heading = makeElement("h2", "category-heading");
+
+  const input = makeElement("input", "draft-name");
+  input.type = "text";
+  input.placeholder = "New category name";
+  input.maxLength = 50;
+  input.required = true;
+  input.setAttribute(
+    "aria-label",
+    "New category name. Type a name and press Enter."
+  );
+
+  heading.append(input);
+  form.append(
+    heading,
+    makeElement("p", "draft-hint", "Type the category name and press Enter.")
+  );
+
+  const cancel = makeElement("button", "cancel-draft-button", "Cancel");
+  cancel.type = "button";
+  cancel.addEventListener("click", () => {
+    draftCategoryActive = false;
+    render();
+  });
+  form.append(cancel);
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const name = input.value.trim();
+    if (!name) return;
+
+    if (categories.some(category =>
+      category.name.toLowerCase() === name.toLowerCase()
+    )) {
+      alert("A category with that name already exists.");
+      input.focus();
+      return;
+    }
+
+    const category = { id: makeId("category"), name, links: [] };
+    categories.push(category);
+    openCategoryIds.add(category.id);
+    draftCategoryActive = false;
+    saveCategories();
+    render();
+  });
+
+  card.append(form);
+  return card;
+}
+
+function getColumnCount() {
+  if (window.matchMedia("(max-width: 600px)").matches) return 1;
+  if (window.matchMedia("(max-width: 900px)").matches) return 2;
+  return 3;
+}
+
+function render() {
+  const query = searchBox.value.trim().toLowerCase();
+  const hasRecent = renderRecent(query);
+  const columnCount = getColumnCount();
+
+  lastColumnCount = columnCount;
+  categoriesElement.replaceChildren();
+
+  const columns = [];
+  for (let index = 0; index < columnCount; index++) {
+    const column = makeElement("div", "category-column");
+    columns.push(column);
+    categoriesElement.append(column);
+  }
+
+  let hasVisibleCategory = false;
+
+  categories.forEach((category, index) => {
+    const card = buildCategoryCard(category, query);
+    if (!card.hidden) hasVisibleCategory = true;
+    columns[index % columnCount].append(card);
+  });
+
+  if (draftCategoryActive) {
+    columns[categories.length % columnCount].append(buildDraftCard());
+  }
+
+  noResults.hidden = !query || hasVisibleCategory || hasRecent;
+  editModeButton.textContent = editMode
+    ? "✓ Finish editing"
+    : "✏ Edit category";
+}
+
+function handleDragStart(event) {
+  const handle = event.target.closest(".drag-handle");
+  if (!editMode || !handle) return;
+
+  const payload = {
+    type: handle.dataset.dragType,
+    categoryId: handle.dataset.categoryId,
+    linkId: handle.dataset.linkId || ""
+  };
+
+  event.dataTransfer.setData("text/plain", JSON.stringify(payload));
+  event.dataTransfer.effectAllowed = "move";
+
+  const source = handle.closest(".link-row") || handle.closest(".card");
+  if (source) source.classList.add("dragging");
+}
+
+function handleDragEnd() {
+  document.querySelectorAll(".dragging, .drop-target").forEach(element => {
+    element.classList.remove("dragging", "drop-target");
+  });
+}
+
+categoriesElement.addEventListener("dragstart", handleDragStart);
+categoriesElement.addEventListener("dragend", handleDragEnd);
+
+categoriesElement.addEventListener("dragover", event => {
+  if (!editMode) return;
+
+  const target = event.target.closest(".link-row, .card");
+  if (!target || target.classList.contains("draft-card")) return;
+
+  event.preventDefault();
+  target.classList.add("drop-target");
+  event.dataTransfer.dropEffect = "move";
+});
+
+categoriesElement.addEventListener("dragleave", event => {
+  const target = event.target.closest(".link-row, .card");
+  if (target && !target.contains(event.relatedTarget)) {
+    target.classList.remove("drop-target");
+  }
+});
+
+categoriesElement.addEventListener("drop", event => {
+  if (!editMode) return;
+
+  const targetRow = event.target.closest(".link-row");
+  const targetCard = event.target.closest(".card");
+  if (!targetCard || targetCard.classList.contains("draft-card")) return;
+
+  event.preventDefault();
+
+  let payload;
+  try {
+    payload = JSON.parse(event.dataTransfer.getData("text/plain"));
+  } catch (error) {
+    return;
+  }
+
+  const targetCategoryId = targetCard.dataset.categoryId;
+
+  if (payload.type === "category") {
+    reorderCategory(payload.categoryId, targetCategoryId);
+  } else if (payload.type === "link") {
+    if (targetRow) {
+      moveLink(
+        payload.categoryId,
+        payload.linkId,
+        targetRow.dataset.categoryId,
+        targetRow.dataset.linkId
+      );
+    } else {
+      moveLink(payload.categoryId, payload.linkId, targetCategoryId, null);
+    }
+  }
+
+  handleDragEnd();
+});
+
+plusButton.addEventListener("click", () => {
+  const willOpen = actionMenu.hidden;
+  actionMenu.hidden = !willOpen;
+  plusButton.setAttribute("aria-expanded", String(willOpen));
+});
+
+document.getElementById("newCategoryButton")
+  .addEventListener("click", startNewCategory);
+
+editModeButton.addEventListener("click", () => {
+  actionMenu.hidden = true;
+  plusButton.setAttribute("aria-expanded", "false");
+  if (editMode) exitEditMode();
+  else enterEditMode();
+});
+
+document.getElementById("undoButton")
+  .addEventListener("click", performUndo);
+
+searchBox.addEventListener("input", () => {
+  const query = searchBox.value.trim().toLowerCase();
+  searchAutoOpenIds = new Set();
+
+  if (query) {
+    categories.forEach(category => {
+      if (category.links.some(link =>
+        link.name.toLowerCase().includes(query)
+      )) {
+        searchAutoOpenIds.add(category.id);
+      }
+    });
+  }
+
+  render();
+});
+
+window.addEventListener("resize", () => {
+  if (getColumnCount() !== lastColumnCount) render();
+});
+
+/* Clicks on empty page space close open categories.
+   Buttons, links, inputs, and link rows do not count as empty space. */
+document.addEventListener("click", event => {
+  const target = event.target;
+  const actionArea = document.getElementById("actionArea");
+
+  if (!actionArea.contains(target)) {
+    actionMenu.hidden = true;
+    plusButton.setAttribute("aria-expanded", "false");
+  }
+
+  if (editMode) return;
+
+  const clickedControl = target.closest(
+    "button, a, input, select, textarea, form, .link-row, .drag-handle, .undo-toast"
+  );
+
+  if (clickedControl) return;
+
+  if (openCategoryIds.size || searchAutoOpenIds.size) {
+    openCategoryIds.clear();
+    searchAutoOpenIds.clear();
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
