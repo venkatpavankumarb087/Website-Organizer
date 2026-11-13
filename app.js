@@ -67,66 +67,6 @@
         { id: 'hackerrank', name: 'HackerRank', url: 'https://www.hackerrank.com', createdAt: 1715018000000, description: 'Coding practice & certificates', history: [] },
         { id: 'codechef', name: 'CodeChef', url: 'https://www.codechef.com', createdAt: 1715019000000, description: 'Competitive programming', history: [] }
       ]
-    },
-    {
-      id: 'course',
-      name: 'COURSE',
-      links: [
-        { id: 'coursera', name: 'Coursera', url: 'https://www.coursera.org', createdAt: 1715020000000, description: 'Online university courses', history: [] },
-        { id: 'nptel', name: 'NPTEL', url: 'https://nptel.ac.in', createdAt: 1715021000000, description: 'IIT engineering courses', history: [] },
-        { id: 'udemy', name: 'Udemy', url: 'https://www.udemy.com', createdAt: 1715022000000, description: 'Skill video courses', history: [] }
-      ]
-    },
-    {
-      id: 'hack-labs',
-      name: 'HACK LABS',
-      links: [
-        { id: 'htb', name: 'Hack The Box', url: 'https://www.hackthebox.com', createdAt: 1715023000000, description: 'Cybersecurity training labs', history: [] },
-        { id: 'tryhackme', name: 'TryHackMe', url: 'https://tryhackme.com', createdAt: 1715024000000, description: 'Hands-on hacking labs', history: [] }
-      ]
-    },
-    {
-      id: 'dsa',
-      name: 'DSA',
-      links: [
-        { id: 'neetcode', name: 'NeetCode', url: 'https://neetcode.io', createdAt: 1715025000000, description: 'Algorithms study roadmap', history: [] },
-        { id: 'striver', name: 'Take U Forward', url: 'https://takeuforward.org', createdAt: 1715026000000, description: 'Striver A2Z DSA sheet', history: [] },
-        { id: 'gfg', name: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org', createdAt: 1715027000000, description: 'Computer science portal', history: [] }
-      ]
-    },
-    {
-      id: 'useful-websites',
-      name: 'Useful websites',
-      links: [
-        { id: 'github', name: 'GitHub', url: 'https://www.github.com', createdAt: 1715028000000, description: 'Code repositories and git', history: [] },
-        { id: 'stackoverflow', name: 'Stack Overflow', url: 'https://stackoverflow.com', createdAt: 1715029000000, description: 'Developer Q&A community', history: [] },
-        { id: 'mdn', name: 'MDN Web Docs', url: 'https://developer.mozilla.org', createdAt: 1715030000000, description: 'Web standards documentation', history: [] }
-      ]
-    },
-    {
-      id: 'online-shopping',
-      name: 'online shopping',
-      links: [
-        { id: 'amazon', name: 'Amazon', url: 'https://www.amazon.in', createdAt: 1715031000000, description: 'Online store', history: [] },
-        { id: 'flipkart', name: 'Flipkart', url: 'https://www.flipkart.com', createdAt: 1715032000000, description: 'Electronics & shopping', history: [] }
-      ]
-    },
-    {
-      id: 'ai-coding',
-      name: 'AI Coding',
-      links: [
-        { id: 'cursor', name: 'Cursor', url: 'https://www.cursor.com', createdAt: 1715033000000, description: 'AI Code Editor', history: [] },
-        { id: 'v0', name: 'v0 by Vercel', url: 'https://v0.dev', createdAt: 1715034000000, description: 'Generative UI with AI', history: [] },
-        { id: 'replit', name: 'Replit', url: 'https://replit.com', createdAt: 1715035000000, description: 'Online collaborative IDE', history: [] }
-      ]
-    },
-    {
-      id: 'unexplored',
-      name: 'Unexplored',
-      links: [
-        { id: 'huggingface', name: 'Hugging Face', url: 'https://huggingface.co', createdAt: 1715036000000, description: 'AI models and datasets', history: [] },
-        { id: 'producthunt', name: 'Product Hunt', url: 'https://www.producthunt.com', createdAt: 1715037000000, description: 'Discover new tech products', history: [] }
-      ]
     }
   ];
 
